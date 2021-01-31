@@ -7,15 +7,21 @@ namespace App
     {
         static void Main(string[] args)
         {
-            var input = "0";
+            var input = "abc";
             WriteLine(input);
             
             var normalizedInput = Kerberos.normalizeLength(input);
             WriteLine(normalizedInput);
             
-            var blocks = Kerberos.toBlocks(normalizedInput);
-            foreach (var block in blocks) 
-                WriteLine(block);
+            // var blocks = Kerberos.toBlocks(normalizedInput);
+            // foreach (var block in blocks) 
+            //     WriteLine(block);
+
+            var binaryInput = Kerberos.toBinaryFormat(normalizedInput);
+            WriteLine(binaryInput);
+
+            var decodedInput = Kerberos.fromBinaryFormat(binaryInput);
+            WriteLine(decodedInput);
         }
     }
 }
