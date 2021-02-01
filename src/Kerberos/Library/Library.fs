@@ -2,6 +2,7 @@
 
 open System
 open System.Collections.Immutable
+open System.Linq
 open Library
 
 module Kerberos =
@@ -24,7 +25,7 @@ module Kerberos =
 
         String.collect binaryMapper source
 
-    let toBlocks (normalizedSource: string): ImmutableList<string> =
+    let toBinaryBlocks (normalizedSource: string): ImmutableList<string> =
         let blockCount =
             normalizedSource.Length * Constants.charSize
             / Constants.blockSize
@@ -117,4 +118,27 @@ module Kerberos =
         let chunks = Seq.map chunk range
         Seq.map parseChunk chunks |> Seq.toArray
     
+    // 0. s
+    // 1. normS = normalizeLength s
+    // 2. binaryBlocks = toBinaryBlocks normS
+    // 3. normK = normalizeKey
+    // 4. binK = toBinaryFormat normk
+    // 5. shiftedK, encryptedBlocks =  cycle binaryBlocks binK
+    // 5a. finalK = shiftLeft binK
     
+    let private crypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) desCode shift finalShift =
+        let mutable blocks = binaryBlocks.ToArray()
+        let mutable key = binaryNormalizedKey
+        for i in 1 .. Constants.roundCount do
+            for block in 0 .. binaryBlocks.Count - 1 do
+                blocks.[block] <- (desCode blocks.[block] key)
+            key <- shift key
+        key <- finalShift key
+        (binaryBlocks, key)
+    
+    let encrypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) =
+        crypt binaryBlocks binaryNormalizedKey desEncode shiftRight shiftLeft
+    
+    let decrypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) =
+        crypt binaryBlocks binaryNormalizedKey desDecode shiftLeft shiftRight
+        
