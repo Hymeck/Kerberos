@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Library;
 using static System.Console;
@@ -10,42 +11,47 @@ namespace App
     {
         static async Task Main(string[] args)
         {
-            var input = "abc";
+            InputEncoding = Encoding.UTF8;
+            OutputEncoding = Encoding.UTF8;
+            
+            var input = args.Length == 0 ? "abc" : args[0];
             WriteLine(input);
             
+            // 1. normalize string
             var normalizedInput = Kerberos.normalizeLength(input);
             WriteLine(normalizedInput);
             
-            // var blocks = Kerberos.toBlocks(normalizedInput);
-            // foreach (var block in blocks) 
-            //     WriteLine(block);
-
-            var binaryInput = Kerberos.toBinaryFormat(normalizedInput);
-            WriteLine(binaryInput);
-
-            var decodedInput = Kerberos.fromBinaryFormat(binaryInput);
-            WriteLine(decodedInput);
-
-            var blocks = Kerberos.toBinaryBlocks(normalizedInput);
+            // 2. to binary blocks
+            var binaryBlocks = Kerberos.toBinaryBlocks(normalizedInput);
+            WriteLine(string.Join(' ', binaryBlocks));
 
             var key = "хой";
             WriteLine(key);
+            
+            // 3. normalize key
             var normalizedKey = Kerberos.normalizeKey(
                 key, 
-                normalizedInput.Length / (2 * blocks.Count));
+                normalizedInput.Length / (2 * binaryBlocks.Count));
+            WriteLine(normalizedKey);
 
+            // 4. to binary key
             var binaryKey = Kerberos.toBinaryFormat(normalizedKey);
+            WriteLine(binaryKey);
 
-            var (encryptedBinaryBlocks, encryptedKey) = Kerberos.encrypt(blocks, binaryKey);
+            // 5. DES encrypt
+            var (encryptedBinaryBlocks, encryptedKey) = Kerberos.encrypt(binaryBlocks, binaryKey);
+            WriteLine(string.Join("\t", encryptedKey, string.Join(' ', encryptedBinaryBlocks)));
+            
+            // 6. write result of the encryption
             await using var swEncrypted = new StreamWriter("outputEncrypted.txt");
-            await swEncrypted.WriteAsync(string.Join(string.Empty, encryptedBinaryBlocks));
+            await swEncrypted.WriteAsync(Kerberos.fromListToNormalFormat(encryptedBinaryBlocks));
             
+            // 7. write result of the decryption
             var (decryptedBinaryBlocks, decryptedKey) = Kerberos.decrypt(encryptedBinaryBlocks, encryptedKey);
-
             await using var swDecrypted = new StreamWriter("outputDecrypted.txt");
-            await swDecrypted.WriteAsync(string.Join(string.Empty, decryptedBinaryBlocks));
+            await swDecrypted.WriteAsync(Kerberos.fromListToNormalFormat(decryptedBinaryBlocks));
             
-            WriteLine(decryptedKey);
+            WriteLine(string.Join("\t", decryptedKey, string.Join(' ', decryptedBinaryBlocks)));
         }
     }
 }

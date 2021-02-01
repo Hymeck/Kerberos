@@ -59,7 +59,7 @@ module Kerberos =
 
         if (l <> r) then '1' else '0'
 
-    let private xor (left: string) (right: string) =
+    let private xor (left: string) (right: string): string =
         Seq.zip left right
         |> Seq.map charXor
         |> Seq.toArray
@@ -86,59 +86,74 @@ module Kerberos =
     let private shiftRight (key: string): string =
         let addToStart (str: string) = string (str.Chars(str.Length - 1)) + str
         let removeLast (str: string) = str.Remove(str.Length - 1, 1)
-        
+
         let mutable shiftedKey = key
+
         for i in 1 .. Constants.keyShift do
             shiftedKey <- shiftedKey |> addToStart |> removeLast
 
         shiftedKey
-    
+
     let private shiftLeft (key: string): string =
         let addToEnd (str: string) = str + string (str.Chars(0))
         let removeFirst (str: string) = str.Remove(0, 1)
-        
+
         let mutable shiftedKey = key
+
         for i in 1 .. Constants.keyShift do
             shiftedKey <- shiftedKey |> addToEnd |> removeFirst
 
         shiftedKey
-    
+
     let private parseChunk (binaryChunk: string): char =
         let mutable degree = binaryChunk.Length - 1
         let mutable result = 0
+
         for digit in binaryChunk do
-            let parsedDigit = Convert.ToInt32 (string digit) * int (Math.Pow (float 2, float degree))
+            let parsedDigit =
+                Convert.ToInt32(string digit)
+                * int (Math.Pow(float 2, float degree))
+
             result <- result + parsedDigit
             degree <- degree - 1
+
         char result
-        
-    let fromBinaryFormat (binarySource: string) =
-        let chunk (chunkIndex: int) = binarySource.Substring (chunkIndex * Constants.charSize, Constants.charSize)
-        let range = seq { for i in 1 .. binarySource.Length / Constants.charSize -> i - 1 }
+
+    let fromBinaryFormat (binarySource: string): string =
+        let chunk (chunkIndex: int) =
+            binarySource.Substring(chunkIndex * Constants.charSize, Constants.charSize)
+
+        let range =
+            seq { for i in 1 .. binarySource.Length / Constants.charSize -> i - 1 }
+
         let chunks = Seq.map chunk range
-        Seq.map parseChunk chunks |> Seq.toArray |> fun cs -> new string(cs)
-    
-    // 0. s
-    // 1. normS = normalizeLength s
-    // 2. binaryBlocks = toBinaryBlocks normS
-    // 3. normK = normalizeKey
-    // 4. binK = toBinaryFormat normk
-    // 5. shiftedK, encryptedBlocks =  cycle binaryBlocks binK
-    // 5a. finalK = shiftLeft binK
-    
+
+        Seq.map parseChunk chunks
+        |> Seq.toArray
+        |> fun cs -> new string(cs)
+
     let private crypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) desCode shift finalShift =
         let mutable blocks = binaryBlocks.ToArray()
         let mutable key = binaryNormalizedKey
+
         for i in 1 .. Constants.roundCount do
             for block in 0 .. binaryBlocks.Count - 1 do
                 blocks.[block] <- (desCode blocks.[block] key)
+
             key <- shift key
+
         key <- finalShift key
-        (binaryBlocks, key)
-    
+        (ImmutableList.ToImmutableList blocks, key)
+
     let encrypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) =
         crypt binaryBlocks binaryNormalizedKey desEncode shiftRight shiftLeft
-    
+
     let decrypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) =
         crypt binaryBlocks binaryNormalizedKey desDecode shiftLeft shiftRight
-        
+
+    let fromListToNormalFormat (binaryBlocks: ImmutableList<string>): string =
+        (String.Empty, binaryBlocks)
+        |> String.Join
+        |> fromBinaryFormat
+
+    let fromStrToNormalFormat (source: string): string = source |> fromBinaryFormat
