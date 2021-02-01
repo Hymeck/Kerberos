@@ -6,7 +6,7 @@ open System.Linq
 open Library
 
 module Kerberos =
-    let isCorrectSize (source: string): bool =
+    let private isCorrectSize (source: string): bool =
         (source.Length * Constants.charSize) % Constants.blockSize = 0
 
     let rec normalizeLength (source: string): string =
@@ -14,7 +14,7 @@ module Kerberos =
         then source
         else normalizeLength (source + string Constants.normalizeChar)
 
-    let rec normalizeBinary (binarySource: string): string =
+    let rec private normalizeBinary (binarySource: string): string =
         if binarySource.Length = Constants.charSize
         then binarySource
         else normalizeBinary (string Constants.zero + binarySource)
@@ -48,7 +48,7 @@ module Kerberos =
             (String.replicate zeroLength (string Constants.zero))
             + key
 
-    let charXor (pair: char * char): char =
+    let private charXor (pair: char * char): char =
         let left, right = pair
 
         let l =
@@ -59,15 +59,15 @@ module Kerberos =
 
         if (l <> r) then '1' else '0'
 
-    let xor (left: string) (right: string) =
+    let private xor (left: string) (right: string) =
         Seq.zip left right
         |> Seq.map charXor
         |> Seq.toArray
-        |> string
+        |> fun cs -> new string(cs)
 
-    let encryptionFunction (left: string) (right: string): string = xor left right
+    let private encryptionFunction (left: string) (right: string): string = xor left right
 
-    let desEncode (input: string) (key: string): string =
+    let private desEncode (input: string) (key: string): string =
         let middle = input.Length / 2
         let left = input.Substring(0, middle)
         let right = input.Substring(middle)
@@ -75,7 +75,7 @@ module Kerberos =
         right
         + (key |> encryptionFunction right |> xor left)
 
-    let desDecode (input: string) (key: string): string =
+    let private desDecode (input: string) (key: string): string =
         let middle = input.Length / 2
         let left = input.Substring(0, middle)
         let right = input.Substring(middle)
@@ -83,7 +83,7 @@ module Kerberos =
         (right |> xor (key |> encryptionFunction left))
         + left
 
-    let shiftRight (key: string): string =
+    let private shiftRight (key: string): string =
         let addToStart (str: string) = string (str.Chars(str.Length - 1)) + str
         let removeLast (str: string) = str.Remove(str.Length - 1, 1)
         
@@ -93,7 +93,7 @@ module Kerberos =
 
         shiftedKey
     
-    let shiftLeft (key: string): string =
+    let private shiftLeft (key: string): string =
         let addToEnd (str: string) = str + string (str.Chars(0))
         let removeFirst (str: string) = str.Remove(0, 1)
         
@@ -103,7 +103,7 @@ module Kerberos =
 
         shiftedKey
     
-    let parseChunk (binaryChunk: string): char =
+    let private parseChunk (binaryChunk: string): char =
         let mutable degree = binaryChunk.Length - 1
         let mutable result = 0
         for digit in binaryChunk do
@@ -116,7 +116,7 @@ module Kerberos =
         let chunk (chunkIndex: int) = binarySource.Substring (chunkIndex * Constants.charSize, Constants.charSize)
         let range = seq { for i in 1 .. binarySource.Length / Constants.charSize -> i - 1 }
         let chunks = Seq.map chunk range
-        Seq.map parseChunk chunks |> Seq.toArray
+        Seq.map parseChunk chunks |> Seq.toArray |> fun cs -> new string(cs)
     
     // 0. s
     // 1. normS = normalizeLength s
