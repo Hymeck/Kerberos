@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Library", "Library\Library.fsproj", "{D2B4A835-803F-4337-9E7F-A7E9F2DADC2D}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "DES", "DES\DES.fsproj", "{D2B4A835-803F-4337-9E7F-A7E9F2DADC2D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "App\App.csproj", "{214ECD92-7908-4E18-AD31-FF66A5EDC797}"
 EndProject

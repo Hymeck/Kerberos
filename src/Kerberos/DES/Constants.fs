@@ -1,4 +1,4 @@
-﻿namespace Library
+﻿namespace DES
 
 module Constants =
     let charSize = 16

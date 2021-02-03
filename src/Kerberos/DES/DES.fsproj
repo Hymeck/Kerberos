@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Library</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>    
     <Compile Include="Constants.fs" />
-    <Compile Include="Library.fs" />
+    <Compile Include="DES.fs" />
   </ItemGroup>
 
 </Project>
