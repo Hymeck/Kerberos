@@ -1,6 +1,6 @@
-﻿namespace Domain
+﻿namespace Kerberos
 
-open Kerberos.Domain
+open Domain
 
 module Core =
     let encryptASResponse (asResponse: ASResponse) (clientSecretKey: string) (tgsSecretKey: string): ASResponse=

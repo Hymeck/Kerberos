@@ -95,7 +95,7 @@ namespace App
             OutputEncoding = outputEncoding;
         }
 
-        private static Kerberos.Domain.ASRequest CreateAsRequest()
+        private static ASRequest CreateAsRequest()
         {
             var ipAddress = IPAddress.Parse("127.0.0.1");
             var tgtLifetime = TimeSpan.FromSeconds(5);
