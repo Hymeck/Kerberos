@@ -26,7 +26,7 @@ module Domain =
           tgsSessionKey: string }
 
     type ASResponse =
-        { attribute: ASResponseAttribute (* encrypt with client secket key *)
+        { attribute: ASResponseAttribute (* encrypt with client secret key *)
           tgt: TicketGrantingTicket (* encrypt with TGS secret key *)  }
 
     type TGSRequestAttribute =
@@ -60,11 +60,11 @@ module Domain =
 
     type ServiceRequest =
         { serviceTicket: ServiceTicket (* was encrypted with service secret key *)
-          userAuthenticator: UserAuthenticator (* encypt with service session key *)  }
+          userAuthenticator: UserAuthenticator (* encrypt with service session key *)  }
 
     type ServiceAttribute =
         { serviceId: string
           timestamp: DateTime }
 
     type ServiceResponse =
-        { attribute: ServiceAttribute (* encypt with service session key *)  } 
+        { attribute: ServiceAttribute (* encrypt with service session key *)  } 

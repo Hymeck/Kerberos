@@ -144,15 +144,31 @@ module Utils =
         key <- finalShift key
         (ImmutableList.ToImmutableList blocks, key)
 
-    let encrypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) =
-        crypt binaryBlocks binaryNormalizedKey desEncode shiftRight shiftLeft
-
-    let decrypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) =
-        crypt binaryBlocks binaryNormalizedKey desDecode shiftLeft shiftRight
-
     let fromListToNormalFormat (binaryBlocks: ImmutableList<string>): string =
         (String.Empty, binaryBlocks)
         |> String.Join
         |> fromBinaryFormat
 
     let fromStrToNormalFormat (source: string): string = source |> fromBinaryFormat
+    
+    let encrypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) =
+        crypt binaryBlocks binaryNormalizedKey desEncode shiftRight shiftLeft
+
+    let decrypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) =
+        crypt binaryBlocks binaryNormalizedKey desDecode shiftLeft shiftRight
+    
+    let private fullCrypt (source: string) (key: string) cryptFunction: string =
+        let input = normalizeLength source
+        let binaryBlocks = toBinaryBlocks input
+        let normalizedKey = normalizeKey key (input.Length / 2 * binaryBlocks.Count)
+        let binaryKey = toBinaryFormat normalizedKey
+        let (blocks, _) = cryptFunction binaryBlocks binaryKey
+        fromListToNormalFormat blocks
+    
+    let fullEncrypt (source: string) (key: string) =
+        fullCrypt source key encrypt
+        
+    let fullDecrypt (source: string) (key: string) =
+        fullCrypt source key decrypt
+        
+    

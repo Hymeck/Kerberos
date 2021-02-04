@@ -22,7 +22,7 @@ namespace App
             // 0. create request to AS
             var asRequest = CreateAsRequest();
             
-            // 1. send request to AS and recieve response from AS
+            // 1. send request to AS and receive response from AS
             await Task.Delay(1000);
             var asResponse = CreateAsResponse(asRequest);
             
@@ -119,7 +119,7 @@ namespace App
             var tgsSessionKey = GenerateTgsSessionKey();
             
             var attribute = new ASResponseAttribute(
-                tgsId, timestamp, lifetime, tgsSessionKey); // encrypt with client secket key
+                tgsId, timestamp, lifetime, tgsSessionKey); // encrypt with client secret key
             
             var tgt = new TicketGrantingTicket(
                 request.userId,
@@ -127,7 +127,7 @@ namespace App
                 timestamp,
                 ips,
                 lifetime,
-                tgsSessionKey); // encrypt with secket key
+                tgsSessionKey); // encrypt with secret key
 
             return new ASResponse(attribute, tgt);
         }
