@@ -6,7 +6,7 @@ open System.Net
 
 module Domain =
     type ASRequest =
-        { id: string
+        { userId: string
           serviceId: string
           ipAddress: IPAddress
           tgtLifetime: TimeSpan }

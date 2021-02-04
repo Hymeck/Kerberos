@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DES\DES.fsproj" />
+    <ProjectReference Include="..\Kerberos\Kerberos.fsproj" />
   </ItemGroup>
 
 </Project>
