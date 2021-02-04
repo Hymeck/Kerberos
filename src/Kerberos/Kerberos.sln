@@ -7,6 +7,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "DES", "DES\DES.fsproj", "{D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "App\App.csproj", "{214ECD92-7908-4E18-AD31-FF66A5EDC797}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Kerberos", "Kerberos\Kerberos.fsproj", "{14F4D1E5-110F-4318-A724-3600D53EFE4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{214ECD92-7908-4E18-AD31-FF66A5EDC797}.Release|x64.Build.0 = Release|Any CPU
 		{214ECD92-7908-4E18-AD31-FF66A5EDC797}.Release|x86.ActiveCfg = Release|Any CPU
 		{214ECD92-7908-4E18-AD31-FF66A5EDC797}.Release|x86.Build.0 = Release|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Debug|x64.Build.0 = Debug|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Debug|x86.Build.0 = Debug|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Release|x64.ActiveCfg = Release|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Release|x64.Build.0 = Release|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Release|x86.ActiveCfg = Release|Any CPU
+		{14F4D1E5-110F-4318-A724-3600D53EFE4B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
