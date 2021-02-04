@@ -7,7 +7,7 @@
 
   <ItemGroup>    
     <Compile Include="Constants.fs" />
-    <Compile Include="DES.fs" />
+    <Compile Include="Utils.fs" />
   </ItemGroup>
 
 </Project>

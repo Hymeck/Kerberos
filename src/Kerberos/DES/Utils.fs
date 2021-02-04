@@ -4,7 +4,7 @@ open System
 open System.Collections.Immutable
 open System.Linq
 
-module Kerberos =
+module Utils =
     let private isCorrectSize (source: string): bool =
         (source.Length * Constants.charSize) % Constants.blockSize = 0
 
@@ -118,11 +118,7 @@ module Kerberos =
 
         char result
 
-<<<<<<< HEAD:src/Kerberos/DES/DES.fs
-    let fromBinaryFormat (binarySource: string) =
-=======
     let fromBinaryFormat (binarySource: string): string =
->>>>>>> 3f9ea0f0057f54dcc47506cb8eb9eb59334bc59f:src/Kerberos/Library/Library.fs
         let chunk (chunkIndex: int) =
             binarySource.Substring(chunkIndex * Constants.charSize, Constants.charSize)
 
@@ -146,19 +142,12 @@ module Kerberos =
             key <- shift key
 
         key <- finalShift key
-<<<<<<< HEAD:src/Kerberos/DES/DES.fs
-        (binaryBlocks, key)
-=======
         (ImmutableList.ToImmutableList blocks, key)
->>>>>>> 3f9ea0f0057f54dcc47506cb8eb9eb59334bc59f:src/Kerberos/Library/Library.fs
 
     let encrypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) =
         crypt binaryBlocks binaryNormalizedKey desEncode shiftRight shiftLeft
 
     let decrypt (binaryBlocks: ImmutableList<string>) (binaryNormalizedKey: string) =
-<<<<<<< HEAD:src/Kerberos/DES/DES.fs
-        crypt binaryBlocks binaryNormalizedKey desDecode shiftLeft shiftRight
-=======
         crypt binaryBlocks binaryNormalizedKey desDecode shiftLeft shiftRight
 
     let fromListToNormalFormat (binaryBlocks: ImmutableList<string>): string =
@@ -167,4 +156,3 @@ module Kerberos =
         |> fromBinaryFormat
 
     let fromStrToNormalFormat (source: string): string = source |> fromBinaryFormat
->>>>>>> 3f9ea0f0057f54dcc47506cb8eb9eb59334bc59f:src/Kerberos/Library/Library.fs
