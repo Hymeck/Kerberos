@@ -14,14 +14,14 @@ module Domain =
     type TicketGrantingTicket =
         { userId: string
           tgsId: string
-          timestamp: DateTime
+          timestamp: DateTimeOffset
           userIpAddress: ImmutableList<IPAddress>
           lifetime: TimeSpan
           tgsSessionKey: string }
 
     type ASResponseAttribute =
         { tgsId: string
-          timestamp: DateTime
+          timestamp: DateTimeOffset
           lifetime: TimeSpan (* same as TGT lifetime *)
           tgsSessionKey: string }
 
@@ -33,7 +33,7 @@ module Domain =
         { serviceId: string
           ticketLifetime: TimeSpan }
 
-    type UserAuthenticator = { userId: string; timestamp: DateTime }
+    type UserAuthenticator = { userId: string; timestamp: DateTimeOffset }
 
     type TGSRequest =
         { tgt: TicketGrantingTicket (* was encrypted with TGS secret key *)
@@ -42,14 +42,14 @@ module Domain =
 
     type TGSResponseAttribute =
         { serviceId: string
-          timestamp: DateTime
+          timestamp: DateTimeOffset
           lifetime: TimeSpan
           serviceSessionKey: string }
 
     type ServiceTicket =
         { userId: string
           serviceId: string
-          timestamp: DateTime
+          timestamp: DateTimeOffset
           userIpAddress: ImmutableList<IPAddress>
           serviceTicketLifetime: TimeSpan
           serviceSessionKey: string }
@@ -64,7 +64,7 @@ module Domain =
 
     type ServiceAttribute =
         { serviceId: string
-          timestamp: DateTime }
+          timestamp: DateTimeOffset }
 
     type ServiceResponse =
         { attribute: ServiceAttribute (* encrypt with service session key *)  } 
