@@ -1,43 +1,17 @@
-﻿namespace Kerberos
+﻿namespace Kerberos.Core
 
-open Domain
+open Kerberos.Domain
+open Encryption
 open DES.Utils
 
 module Core =
-    let private cryptAsResponseAttribute (attr: ASResponseAttribute) (key: string) (crypt): ASResponseAttribute =
-        let tgsId = crypt attr.tgsId key
-        let tgsSessionKey = crypt attr.tgsSessionKey key
-
-        { attr with
-              tgsId = tgsId
-              tgsSessionKey = tgsSessionKey }
-
-    let private cryptTgt (tgt: TicketGrantingTicket) (key: string) (crypt): TicketGrantingTicket =
-        let tgsId = crypt tgt.tgsId key
-        let userId = crypt tgt.userId key
-        let tgsSessionKey = crypt tgt.tgsSessionKey key
-
-        { tgt with
-              tgsId = tgsId
-              userId = userId
-              tgsSessionKey = tgsSessionKey }
-
-    let encryptTgt (tgt: TicketGrantingTicket) (key: string) = cryptTgt tgt key fullEncrypt
-
-    let decryptTgt (tgt: TicketGrantingTicket) (key: string) = cryptTgt tgt key fullDecrypt
-
-    let encryptAsResponseAttribute (attr: ASResponseAttribute) (key: string) =
-        cryptAsResponseAttribute attr key fullEncrypt
-
-    let decryptAsResponseAttribute (attr: ASResponseAttribute) (key: string) =
-        cryptAsResponseAttribute attr key fullDecrypt
 
     let encryptASResponse (asResponse: ASResponse) (clientSecretKey: string) (tgsSecretKey: string): ASResponse =
         // todo: encrypt AS response attribute with client secret key
         let attribute =
-            encryptAsResponseAttribute asResponse.attribute clientSecretKey
+            cryptASResponseAttribute asResponse.attribute clientSecretKey fullEncrypt
         // todo: encrypt tgt with TGS secret key
-        let tgt = encryptTgt asResponse.tgt tgsSecretKey
+        let tgt = cryptTGT asResponse.tgt tgsSecretKey fullEncrypt
         { attribute = attribute; tgt = tgt }
 
     let encryptTGSRequest (tgsRequest: TGSRequest) (tgsSessionKey: string): TGSRequest =
@@ -60,3 +34,6 @@ module Core =
     let encryptServiceResponse (serviceResponse: ServiceResponse) (serviceSessionKey: string): ServiceResponse =
         // todo: encrypt service attribute
         { attribute = serviceResponse.attribute }
+    
+    let decryptASResponseAttribute (attr: ASResponseAttribute) (userSecretKey: string): ASResponseAttribute =
+        cryptASResponseAttribute attr userSecretKey fullDecrypt

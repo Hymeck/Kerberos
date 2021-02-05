@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Tools.fs" />
+        <Compile Include="Encryption.fs" />
+        <Compile Include="Core.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DES\DES.fsproj" />
+      <ProjectReference Include="..\Kerberos.Domain\Kerberos.Domain.fsproj" />
+    </ItemGroup>
+
+</Project>

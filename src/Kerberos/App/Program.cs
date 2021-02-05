@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using static DES.Utils;
 using static System.Console;
-using static Kerberos.Domain;
+using Kerberos.Domain;
 
 namespace App
 {
@@ -27,8 +26,8 @@ namespace App
             var asResponse = CreateAsResponse(asRequest);
             
             // 2.0 decrypt AS's attribute and create TGS request
-            var tgsRequestAttribute = new TGSRequestAttribute(ServiceId, TimeSpan.FromSeconds(7));
-            var tgsRequestUserAuthenticator = new UserAuthenticator(UserId, DateTime.Now);
+            var tgsRequestAttribute = new TGSRequestAttribute(ServiceId, TimeSpan.FromSeconds(7).Ticks.ToString());
+            var tgsRequestUserAuthenticator = new UserAuthenticator(UserId, DateTime.Now.Ticks.ToString());
             var tgsRequest = CreateTgsRequest(asResponse.tgt, tgsRequestAttribute, tgsRequestUserAuthenticator);
             
             // 2.1 send request to TGS and receive response from TGS
@@ -36,7 +35,7 @@ namespace App
             var tgsResponse = CreateTgsResponse(tgsRequest);
             
             // 3.0 decrypt TGS's attribute and create Service request
-            var serviceUserAuthenticator = new UserAuthenticator(UserId, DateTime.Now);
+            var serviceUserAuthenticator = new UserAuthenticator(UserId, DateTime.Now.Ticks.ToString());
             var serviceRequest = new ServiceRequest(tgsResponse.serviceTicket, serviceUserAuthenticator);
             
             // 3.1 send request to Service and receive response from Service
@@ -97,8 +96,8 @@ namespace App
 
         private static ASRequest CreateAsRequest()
         {
-            var ipAddress = IPAddress.Parse("127.0.0.1");
-            var tgtLifetime = TimeSpan.FromSeconds(5);
+            var ipAddress = "127.0.0.1";
+            var tgtLifetime = TimeSpan.FromSeconds(5).Ticks.ToString();
             
             return new ASRequest(UserId, ServiceId, ipAddress, tgtLifetime);
         }
@@ -110,12 +109,12 @@ namespace App
             var guid = Guid.NewGuid();
             return guid.ToString().Replace("", "-");
         }
-        private static ASResponse CreateAsResponse(Kerberos.Domain.ASRequest request)
+        private static ASResponse CreateAsResponse(ASRequest request)
         {
             var tgsId = GetTgsId();
-            var timestamp = DateTime.Now;
+            var timestamp = DateTime.Now.Ticks.ToString();
             var ips = ImmutableList.Create(request.ipAddress);
-            var lifetime = TimeSpan.FromSeconds(6);
+            var lifetime = TimeSpan.FromSeconds(6).Ticks.ToString();
             var tgsSessionKey = GenerateTgsSessionKey();
             
             var attribute = new ASResponseAttribute(
@@ -152,8 +151,8 @@ namespace App
         private static TGSResponse CreateTgsResponse(TGSRequest request)
         {
             var serviceId = request.attribute.serviceId;
-            var timestamp = DateTime.Now;
-            var lifetime = TimeSpan.FromSeconds(8);
+            var timestamp = DateTime.Now.Ticks.ToString();
+            var lifetime = TimeSpan.FromSeconds(8).Ticks.ToString();
             var serviceSessionKey = GetServiceSessionKey();
             var attribute = new TGSResponseAttribute(serviceId, timestamp, lifetime, serviceSessionKey);
 
@@ -170,7 +169,7 @@ namespace App
 
         private static ServiceResponse CreateServiceResponse(ServiceRequest request)
         {
-            var attribute = new ServiceAttribute(request.serviceTicket.serviceId, DateTime.Now);
+            var attribute = new ServiceAttribute(request.serviceTicket.serviceId, DateTime.Now.Ticks.ToString());
             return new ServiceResponse(attribute);
         }
     }
