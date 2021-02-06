@@ -1,6 +1,6 @@
 ﻿namespace Kerberos.Core
 
-open DES.Utils
+open DES.DESMethods
 open Kerberos.Domain
 
 module Tools =

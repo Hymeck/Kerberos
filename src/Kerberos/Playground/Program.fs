@@ -7,7 +7,7 @@ open Kerberos.Client.KerberosClient
 let userId = "punk"
 let serviceId = "punktionary.com"
 let password = "punkPassword"
-let userSecret = "punkSecretKey"
+let userSecret = "[aObL_+p"
 
 let ip = IPAddress.Parse("127.0.0.1")
 
@@ -23,7 +23,7 @@ let main argv =
     let asRequest = createASRequest userData
     
     Console.WriteLine(asRequest)
-    Task.Delay(1000) |> ignore
+    Task.Delay(1000)
     let response = sendASRequest asRequest
     match response with
     | Some r ->

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Utils.fs" />
+    <Compile Include="DESMethods.fs" />
   </ItemGroup>
 
 </Project>

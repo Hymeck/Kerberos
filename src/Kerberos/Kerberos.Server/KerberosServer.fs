@@ -8,13 +8,13 @@ open Kerberos.Core.Core
 
 module KerberosServer =
     let tgsId = "aPxlOvrnj10-"
-    let tgsSecretKey = "zi#gml+ltM"
-    let generateTgsSessionKey = Guid.NewGuid().ToString()
+    let tgsSecretKey = "zi#gml+l"
+    let generateTgsSessionKey = Guid.NewGuid().ToString().Substring(0, 8)
     let userDictionary =
         let userDictionary = Dictionary<string, string>()
-        userDictionary.Add("metalist", "metalistSecretKey")
-        userDictionary.Add("punk","punkSecretKey")
-        userDictionary.Add("drocher","drocherSecretKey")
+        userDictionary.Add("metalist", "Q_ObPm0l")
+        userDictionary.Add("punk","[aObL_+p")
+        userDictionary.Add("drocher","NaOuL_Jg")
         userDictionary
         
     let sendASResponse (request: ASRequest): Option<ASResponse> =

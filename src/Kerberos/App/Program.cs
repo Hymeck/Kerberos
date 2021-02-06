@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
-using DES;
-using static DES.Utils;
+using static DES.DESMethods;
 using static System.Console;
 using Kerberos.Domain;
 

@@ -2,16 +2,17 @@
 
 open Kerberos.Domain
 open Encryption
-open DES.Utils
+open DES.DESMethods
 
 module Core =
 
     let encryptASResponse (asResponse: ASResponse) (clientSecretKey: string) (tgsSecretKey: string): ASResponse =
-        // todo: encrypt AS response attribute with client secret key
         let attribute =
             cryptASResponseAttribute asResponse.attribute clientSecretKey encrypt
-        // todo: encrypt tgt with TGS secret key
-        let tgt = cryptTGT asResponse.tgt tgsSecretKey encrypt
+
+        let tgt =
+            cryptTGT asResponse.tgt tgsSecretKey encrypt
+
         { attribute = attribute; tgt = tgt }
 
     let encryptTGSRequest (tgsRequest: TGSRequest) (tgsSessionKey: string): TGSRequest =
@@ -34,6 +35,6 @@ module Core =
     let encryptServiceResponse (serviceResponse: ServiceResponse) (serviceSessionKey: string): ServiceResponse =
         // todo: encrypt service attribute
         { attribute = serviceResponse.attribute }
-    
+
     let decryptASResponseAttribute (attr: ASResponseAttribute) (userSecretKey: string): ASResponseAttribute =
         cryptASResponseAttribute attr userSecretKey decrypt
