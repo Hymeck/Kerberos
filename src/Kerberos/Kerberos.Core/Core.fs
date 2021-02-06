@@ -9,9 +9,9 @@ module Core =
     let encryptASResponse (asResponse: ASResponse) (clientSecretKey: string) (tgsSecretKey: string): ASResponse =
         // todo: encrypt AS response attribute with client secret key
         let attribute =
-            cryptASResponseAttribute asResponse.attribute clientSecretKey fullEncrypt
+            cryptASResponseAttribute asResponse.attribute clientSecretKey encrypt
         // todo: encrypt tgt with TGS secret key
-        let tgt = cryptTGT asResponse.tgt tgsSecretKey fullEncrypt
+        let tgt = cryptTGT asResponse.tgt tgsSecretKey encrypt
         { attribute = attribute; tgt = tgt }
 
     let encryptTGSRequest (tgsRequest: TGSRequest) (tgsSessionKey: string): TGSRequest =
@@ -36,4 +36,4 @@ module Core =
         { attribute = serviceResponse.attribute }
     
     let decryptASResponseAttribute (attr: ASResponseAttribute) (userSecretKey: string): ASResponseAttribute =
-        cryptASResponseAttribute attr userSecretKey fullDecrypt
+        cryptASResponseAttribute attr userSecretKey decrypt

@@ -5,8 +5,7 @@
     <RootNamespace>Library</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>    
-    <Compile Include="Constants.fs" />
+  <ItemGroup>
     <Compile Include="Utils.fs" />
   </ItemGroup>
 

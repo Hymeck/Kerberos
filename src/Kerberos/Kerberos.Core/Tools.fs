@@ -22,12 +22,12 @@ module Tools =
               userId = userId
               tgsSessionKey = tgsSessionKey }
 
-    let encryptTgt (tgt: TicketGrantingTicket) (key: string) = cryptTgt tgt key fullEncrypt
+    let encryptTgt (tgt: TicketGrantingTicket) (key: string) = cryptTgt tgt key encrypt
 
-    let decryptTgt (tgt: TicketGrantingTicket) (key: string) = cryptTgt tgt key fullDecrypt
+    let decryptTgt (tgt: TicketGrantingTicket) (key: string) = cryptTgt tgt key decrypt
 
     let encryptAsResponseAttribute (attr: ASResponseAttribute) (key: string) =
-        cryptAsResponseAttribute attr key fullEncrypt
+        cryptAsResponseAttribute attr key encrypt
 
     let decryptAsResponseAttribute (attr: ASResponseAttribute) (key: string) =
-        cryptAsResponseAttribute attr key fullDecrypt
+        cryptAsResponseAttribute attr key decrypt
