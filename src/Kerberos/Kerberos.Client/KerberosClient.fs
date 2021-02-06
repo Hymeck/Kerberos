@@ -22,5 +22,18 @@ module KerberosClient =
     let sendASRequest (request: ASRequest): Option<ASResponse> =
         sendASResponse (request)
     
-    let decodeASResponseAttribute (asResponse: ASResponse) (userSecretKey: string): ASResponseAttribute =
-        decryptASResponseAttribute asResponse.attribute userSecretKey
+    let decodeASResponse (response: ASResponse) (userSecretKey: string): ASResponseAttribute =
+        decryptASResponseAttribute response.attribute userSecretKey
+    
+    // tgt, serviceId, ticketLifetime, userId, tgsSessionKey
+    let createTGSRequest (tgt: TicketGrantingTicket) (serviceId: string) (ticketLifetime: TimeSpan) (userId: string) (tgsSessionKey: string): TGSRequest =
+        let attr = {serviceId = serviceId; ticketLifetime = ticketLifetime.Ticks.ToString()}
+        let timestamp = DateTimeOffset.Now.Ticks.ToString()
+        let userAuth = {userId = userId; timestamp = timestamp}
+        let request = {tgt = tgt; attribute = attr; userAuthenticator = userAuth}
+        encryptTGSRequest request tgsSessionKey
+        
+        
+    
+    let sendTGSRequest (request: TGSRequest): Option<TGSResponse> =
+        sendTGSResponse request

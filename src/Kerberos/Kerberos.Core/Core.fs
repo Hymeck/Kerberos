@@ -16,16 +16,16 @@ module Core =
         { attribute = attribute; tgt = tgt }
 
     let encryptTGSRequest (tgsRequest: TGSRequest) (tgsSessionKey: string): TGSRequest =
-        // todo: encrypt user authenticator with TGS session key
+        let userAuth = cryptUserAuthenticator tgsRequest.userAuthenticator tgsSessionKey encrypt
         { tgt = tgsRequest.tgt
           attribute = tgsRequest.attribute
-          userAuthenticator = tgsRequest.userAuthenticator }
+          userAuthenticator = userAuth }
 
     let encryptTGSResponse (tgsResponse: TGSResponse) (tgsSessionKey: string) (serviceSecretKey: string): TGSResponse =
-        // todo: encrypt TGS response attribute with TGS session key
-        // todo: encrypt service ticket with service secret key
-        { attribute = tgsResponse.attribute
-          serviceTicket = tgsResponse.serviceTicket }
+        let attribute = cryptTGSResponseAttribute tgsResponse.attribute tgsSessionKey encrypt
+        let ticket = cryptServiceTicket tgsResponse.serviceTicket serviceSecretKey encrypt
+        { attribute = attribute
+          serviceTicket = ticket }
 
     let encryptServiceRequest (serviceRequest: ServiceRequest) (serviceSessionKey: string): ServiceRequest =
         // todo: encrypt user authenticator with service session key

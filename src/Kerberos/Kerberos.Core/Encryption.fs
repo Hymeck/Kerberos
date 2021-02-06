@@ -3,7 +3,7 @@
 open System.Collections.Immutable
 open Kerberos.Domain
 
-module internal Encryption =
+module Encryption =
     let cryptTGT (tgt: TicketGrantingTicket) (key: string) (crypt): TicketGrantingTicket =
         let crypt str = crypt str key
         let userId = crypt tgt.userId
