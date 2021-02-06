@@ -5,7 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Tools.fs" />
         <Compile Include="Encryption.fs" />
         <Compile Include="Core.fs" />
     </ItemGroup>

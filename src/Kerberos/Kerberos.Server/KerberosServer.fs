@@ -31,6 +31,7 @@ module KerberosServer =
         services.Add("punktionary", "aPb076_!")
         services.Add("drochium", "gvIx-_aq")
         services
+        
 
     let sendASResponse (request: ASRequest): Option<ASResponse> =
         let users = userDictionary
@@ -107,3 +108,22 @@ module KerberosServer =
                       serviceTicket = serviceTicket }
 
                 Some(encryptTGSResponse response tgt.tgsSessionKey services.[serviceId])
+
+    let sendServiceResponse (request: ServiceRequest): Option<ServiceResponse> =
+        //todo: remove hardcode
+        let serviceSecretKey = "aPb076_!"
+
+        let ticket =
+            cryptServiceTicket request.serviceTicket serviceSecretKey decrypt
+
+        let serviceSessionKey = ticket.serviceSessionKey
+        // todo: compare data
+        let serviceId = ticket.serviceId
+        let timestamp = DateTime.Now.Ticks.ToString()
+
+        let attribute =
+            { serviceId = serviceId
+              timestamp = timestamp }
+
+        let response = { attribute = attribute }
+        Some(encryptServiceResponse response serviceSessionKey)

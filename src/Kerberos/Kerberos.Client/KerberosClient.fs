@@ -18,22 +18,53 @@ module KerberosClient =
           serviceId = data.serviceId
           ipAddress = data.ip.ToString()
           tgtLifetime = data.tgtLifetime.Ticks.ToString() }
-    
-    let sendASRequest (request: ASRequest): Option<ASResponse> =
-        sendASResponse (request)
-    
+
+    let sendASRequest (request: ASRequest): Option<ASResponse> = sendASResponse (request)
+
     let decodeASResponse (response: ASResponse) (userSecretKey: string): ASResponseAttribute =
         decryptASResponseAttribute response.attribute userSecretKey
-    
-    // tgt, serviceId, ticketLifetime, userId, tgsSessionKey
-    let createTGSRequest (tgt: TicketGrantingTicket) (serviceId: string) (ticketLifetime: TimeSpan) (userId: string) (tgsSessionKey: string): TGSRequest =
-        let attr = {serviceId = serviceId; ticketLifetime = ticketLifetime.Ticks.ToString()}
+
+    let createTGSRequest (tgt: TicketGrantingTicket)
+                         (serviceId: string)
+                         (ticketLifetime: TimeSpan)
+                         (userId: string)
+                         (tgsSessionKey: string)
+                         : TGSRequest =
+        let attr =
+            { serviceId = serviceId
+              ticketLifetime = ticketLifetime.Ticks.ToString() }
+
         let timestamp = DateTimeOffset.Now.Ticks.ToString()
-        let userAuth = {userId = userId; timestamp = timestamp}
-        let request = {tgt = tgt; attribute = attr; userAuthenticator = userAuth}
+
+        let userAuth =
+            { userId = userId
+              timestamp = timestamp }
+
+        let request =
+            { tgt = tgt
+              attribute = attr
+              userAuthenticator = userAuth }
+
         encryptTGSRequest request tgsSessionKey
-        
-        
+
+    let sendTGSRequest (request: TGSRequest): Option<TGSResponse> = sendTGSResponse request
+
+    let decodeTGSResponse (response: TGSResponse) (tgsSessionKey: string): TGSResponseAttribute =
+        decryptTGSResponseAttribute response.attribute tgsSessionKey
+
+    let createServiceRequest (ticket: ServiceTicket) (userId: string) (serviceSessionKey: string): ServiceRequest =
+        let userAuth =
+            { userId = userId
+              timestamp = DateTime.Now.Ticks.ToString() }
+
+        let request =
+            { serviceTicket = ticket
+              userAuthenticator = userAuth }
+
+        encryptServiceRequest request serviceSessionKey
     
-    let sendTGSRequest (request: TGSRequest): Option<TGSResponse> =
-        sendTGSResponse request
+    let sendServiceRequest (request: ServiceRequest): Option<ServiceResponse> =
+        sendServiceResponse request
+    
+    let decodeServiceResponse (response: ServiceResponse) (serviceSessionKey: string): ServiceAttribute =
+        decryptServiceResponse response.attribute serviceSessionKey
