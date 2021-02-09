@@ -1,25 +1,24 @@
 ﻿open System
 open System.Net
-open System.Text
-open System.Threading.Tasks
 open Kerberos.Client.KerberosClient
 open Kerberos.Domain
 
 let userId = "punk"
 let serviceId = "punktionary"
 let password = "punkPassword"
-let userSecret = "[aObL_+p"
+let userSecret (password: string) = "[aObL_+p"
 
 let ip = IPAddress.Parse("127.0.0.1")
 
 let tgtLifetime = TimeSpan.FromSeconds(float 10)
 
+let printObject (value: obj) =
+    Console.WriteLine()
+    Console.WriteLine(value)
+    Console.WriteLine()
 
 [<EntryPoint>]
 let main argv =
-    Console.InputEncoding <- Encoding.UTF8
-    Console.OutputEncoding <- Encoding.UTF8
-
     let userData =
         { userId = userId
           serviceId = serviceId
@@ -28,53 +27,50 @@ let main argv =
 
     let asRequest = createASRequest userData
 
-    Console.WriteLine(asRequest)
+    printObject asRequest
     let asResponse = sendASRequest asRequest
 
     match asResponse with
-    | Some r -> Console.WriteLine(r)
+    | Some r -> printObject r
     | None -> Console.WriteLine("User does not exist")
 
     let decodedAsResponse =
-        decodeASResponse asResponse.Value userSecret
+        decryptASResponse asResponse.Value (userSecret password)
 
-    Console.WriteLine()
-    Console.WriteLine(decodedAsResponse)
+    printObject decodedAsResponse
 
     let tgsRequest =
         createTGSRequest asResponse.Value.tgt serviceId tgtLifetime userId decodedAsResponse.tgsSessionKey
 
-    Console.WriteLine()
-    Console.WriteLine(tgsRequest)
+    printObject tgsRequest
 
     let tgsResponse = sendTGSRequest tgsRequest
-    Console.WriteLine()
 
     match tgsResponse with
-    | Some r -> Console.WriteLine(r)
+    | Some r -> printObject r
     | None -> Console.WriteLine("Something goes wrong with TGS")
 
     let decodedTgsResponse =
-        decodeTGSResponse tgsResponse.Value decodedAsResponse.tgsSessionKey
+        decryptTGSResponse tgsResponse.Value decodedAsResponse.tgsSessionKey
 
-    Console.WriteLine()
-    Console.WriteLine(decodedTgsResponse)
+    printObject decodedTgsResponse
 
     let serviceRequest =
         createServiceRequest tgsResponse.Value.serviceTicket userId decodedTgsResponse.serviceSessionKey
-    
-    Console.WriteLine()
-    Console.WriteLine(serviceRequest)
-    
-    let serviceResponse = sendServiceRequest serviceRequest
+
+    printObject serviceRequest
+
+    let serviceResponse =
+        sendServiceRequest serviceRequest serviceId
+
     match serviceResponse with
-    | Some r -> Console.WriteLine(r)
+    | Some r -> printObject r
     | None -> Console.WriteLine("Something goes wrong with Service")
-    
-    Console.WriteLine()
-    Console.WriteLine(serviceResponse)
-    
-    let decodedServiceResponse = decodeServiceResponse serviceResponse.Value decodedTgsResponse.serviceSessionKey
-    Console.WriteLine()
-    Console.WriteLine(decodedServiceResponse)
-    0 // return an integer exit code
+
+    printObject serviceResponse.Value
+
+    let decodedServiceResponse =
+        decryptServiceResponse serviceResponse.Value decodedTgsResponse.serviceSessionKey
+
+    printObject decodedServiceResponse
+    0

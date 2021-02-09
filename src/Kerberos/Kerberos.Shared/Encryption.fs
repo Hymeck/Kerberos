@@ -1,28 +1,8 @@
-﻿namespace Kerberos.Core
+﻿namespace Kerberos.Shared
 
-open System.Collections.Immutable
 open Kerberos.Domain
 
 module Encryption =
-    let cryptTGT (tgt: TicketGrantingTicket) (key: string) (crypt): TicketGrantingTicket =
-        let crypt str = crypt str key
-        let userId = crypt tgt.userId
-        let tgsId = crypt tgt.tgsId
-        let timestamp = crypt tgt.timestamp
-
-        let ipAddress =
-            ImmutableList.ToImmutableList(Seq.map crypt tgt.userIpAddress)
-
-        let lifetime = crypt tgt.lifetime
-        let tgsSessionKey = crypt tgt.tgsSessionKey
-
-        { userId = userId
-          tgsId = tgsId
-          timestamp = timestamp
-          userIpAddress = ipAddress
-          lifetime = lifetime
-          tgsSessionKey = tgsSessionKey }
-
     let cryptASResponseAttribute (attr: ASResponseAttribute) (key: string) (crypt): ASResponseAttribute =
         let crypt str = crypt str key
         let tgsId = crypt attr.tgsId
@@ -53,25 +33,6 @@ module Encryption =
         { serviceId = serviceId
           timestamp = timestamp
           lifetime = lifetime
-          serviceSessionKey = serviceSessionKey }
-
-    let cryptServiceTicket (st: ServiceTicket) (key: string) (crypt): ServiceTicket =
-        let crypt str = crypt str key
-        let userId = crypt st.userId
-        let serviceId = crypt st.serviceId
-        let timestamp = crypt st.timestamp
-
-        let ipAddress =
-            ImmutableList.ToImmutableList(Seq.map crypt st.userIpAddress)
-
-        let serviceTicketLifetime = crypt st.serviceTicketLifetime
-        let serviceSessionKey = crypt st.serviceSessionKey
-
-        { userId = userId
-          serviceId = serviceId
-          timestamp = timestamp
-          userIpAddress = ipAddress
-          serviceTicketLifetime = serviceTicketLifetime
           serviceSessionKey = serviceSessionKey }
 
     let cryptServiceAttribute (attr: ServiceAttribute) (key: string) (crypt): ServiceAttribute =

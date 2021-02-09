@@ -4,9 +4,11 @@ open System
 open System.Net
 open Kerberos.Domain
 open Kerberos.Server.KerberosServer
-open Kerberos.Core.Core
+open Kerberos.Shared.Encryption
+open DES.DESMethods
 
 module KerberosClient =
+
     type UserData =
         { userId: string
           serviceId: string
@@ -21,8 +23,16 @@ module KerberosClient =
 
     let sendASRequest (request: ASRequest): Option<ASResponse> = sendASResponse (request)
 
-    let decodeASResponse (response: ASResponse) (userSecretKey: string): ASResponseAttribute =
-        decryptASResponseAttribute response.attribute userSecretKey
+    let decryptASResponse (response: ASResponse) (userSecretKey: string): ASResponseAttribute =
+        cryptASResponseAttribute response.attribute userSecretKey decrypt
+
+    let private encryptTGSRequest (tgsRequest: TGSRequest) (tgsSessionKey: string): TGSRequest =
+        let userAuth =
+            cryptUserAuthenticator tgsRequest.userAuthenticator tgsSessionKey encrypt
+
+        { tgt = tgsRequest.tgt
+          attribute = tgsRequest.attribute
+          userAuthenticator = userAuth }
 
     let createTGSRequest (tgt: TicketGrantingTicket)
                          (serviceId: string)
@@ -49,8 +59,15 @@ module KerberosClient =
 
     let sendTGSRequest (request: TGSRequest): Option<TGSResponse> = sendTGSResponse request
 
-    let decodeTGSResponse (response: TGSResponse) (tgsSessionKey: string): TGSResponseAttribute =
-        decryptTGSResponseAttribute response.attribute tgsSessionKey
+    let decryptTGSResponse (response: TGSResponse) (tgsSessionKey: string): TGSResponseAttribute =
+        cryptTGSResponseAttribute response.attribute tgsSessionKey decrypt
+
+    let private encryptServiceRequest (serviceRequest: ServiceRequest) (serviceSessionKey: string): ServiceRequest =
+        let userAuth =
+            cryptUserAuthenticator serviceRequest.userAuthenticator serviceSessionKey encrypt
+
+        { serviceTicket = serviceRequest.serviceTicket
+          userAuthenticator = userAuth }
 
     let createServiceRequest (ticket: ServiceTicket) (userId: string) (serviceSessionKey: string): ServiceRequest =
         let userAuth =
@@ -62,9 +79,9 @@ module KerberosClient =
               userAuthenticator = userAuth }
 
         encryptServiceRequest request serviceSessionKey
-    
-    let sendServiceRequest (request: ServiceRequest): Option<ServiceResponse> =
-        sendServiceResponse request
-    
-    let decodeServiceResponse (response: ServiceResponse) (serviceSessionKey: string): ServiceAttribute =
-        decryptServiceResponse response.attribute serviceSessionKey
+
+    let sendServiceRequest (request: ServiceRequest) (serviceId: string): Option<ServiceResponse> =
+        sendServiceResponse request serviceId
+
+    let decryptServiceResponse (response: ServiceResponse) (serviceSessionKey: string): ServiceAttribute =
+        cryptServiceAttribute response.attribute serviceSessionKey decrypt

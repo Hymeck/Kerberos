@@ -4,34 +4,51 @@ open System
 open System.Collections.Generic
 open System.Collections.Immutable
 open Kerberos.Domain
-open Kerberos.Core.Core
-open Kerberos.Core.Encryption
+open Kerberos.Shared.Encryption
 open DES.DESMethods
 
 module KerberosServer =
-    let tgsId = "aPxlOvrnj10-"
-    let tgsSecretKey = "zi#gml+l"
-
-    let generateTgsSessionKey =
-        Guid.NewGuid().ToString().Substring(0, 8)
-
-    let generateServiceSessionKey =
-        Guid.NewGuid().ToString().Substring(0, 8)
-
     let userDictionary =
         let users = Dictionary<string, string>()
         users.Add("poet", "Q_ObPm0l")
         users.Add("punk", "[aObL_+p")
         users.Add("drocher", "NaOuL_Jg")
-        users
+        users.ToImmutableDictionary()
 
-    let serviceDictionary =
-        let services = Dictionary<string, string>()
-        services.Add("poetarium", "xnqM<-=t")
-        services.Add("punktionary", "aPb076_!")
-        services.Add("drochium", "gvIx-_aq")
-        services
-        
+    let tgsId = "aPxlOvrnj10-"
+
+    let generateTgsSessionKey =
+        Guid.NewGuid().ToString().Substring(0, 8)
+
+    let cryptTGT (tgt: TicketGrantingTicket) (key: string) (crypt): TicketGrantingTicket =
+        let crypt str = crypt str key
+        let userId = crypt tgt.userId
+        let tgsId = crypt tgt.tgsId
+        let timestamp = crypt tgt.timestamp
+
+        let ipAddress =
+            ImmutableList.ToImmutableList(Seq.map crypt tgt.userIpAddress)
+
+        let lifetime = crypt tgt.lifetime
+        let tgsSessionKey = crypt tgt.tgsSessionKey
+
+        { userId = userId
+          tgsId = tgsId
+          timestamp = timestamp
+          userIpAddress = ipAddress
+          lifetime = lifetime
+          tgsSessionKey = tgsSessionKey }
+
+    let encryptASResponse (asResponse: ASResponse) (clientSecretKey: string) (tgsSecretKey: string): ASResponse =
+        let attribute =
+            cryptASResponseAttribute asResponse.attribute clientSecretKey encrypt
+
+        let tgt =
+            cryptTGT asResponse.tgt tgsSecretKey encrypt
+
+        { attribute = attribute; tgt = tgt }
+
+    let tgsSecretKey = "zi#gml+l"
 
     let sendASResponse (request: ASRequest): Option<ASResponse> =
         let users = userDictionary
@@ -64,8 +81,53 @@ module KerberosServer =
             let response = { attribute = attribute; tgt = tgt }
             Some(encryptASResponse response (users.[request.userId]) (tgsSecretKey))
 
+    let encryptServiceResponse (serviceResponse: ServiceResponse) (serviceSessionKey: string): ServiceResponse =
+        let attr =
+            cryptServiceAttribute serviceResponse.attribute serviceSessionKey encrypt
+
+        { attribute = attr }
+
+    let generateServiceSessionKey =
+        Guid.NewGuid().ToString().Substring(0, 8)
+
+    let serviceDictionary =
+        let services = Dictionary<string, string>()
+        services.Add("poetarium", "xnqM<-=t")
+        services.Add("punktionary", "aPb076_!")
+        services.Add("drochium", "gvIx-_aq")
+        services.ToImmutableDictionary()
+
     let compareTGSRequestInfo (tgt: TicketGrantingTicket) (userAuth: UserAuthenticator): bool =
         tgt.userId = userAuth.userId
+
+    let cryptServiceTicket (st: ServiceTicket) (key: string) (crypt): ServiceTicket =
+        let crypt str = crypt str key
+        let userId = crypt st.userId
+        let serviceId = crypt st.serviceId
+        let timestamp = crypt st.timestamp
+
+        let ipAddress =
+            ImmutableList.ToImmutableList(Seq.map crypt st.userIpAddress)
+
+        let serviceTicketLifetime = crypt st.serviceTicketLifetime
+        let serviceSessionKey = crypt st.serviceSessionKey
+
+        { userId = userId
+          serviceId = serviceId
+          timestamp = timestamp
+          userIpAddress = ipAddress
+          serviceTicketLifetime = serviceTicketLifetime
+          serviceSessionKey = serviceSessionKey }
+
+    let encryptTGSResponse (tgsResponse: TGSResponse) (tgsSessionKey: string) (serviceSecretKey: string): TGSResponse =
+        let attribute =
+            cryptTGSResponseAttribute tgsResponse.attribute tgsSessionKey encrypt
+
+        let ticket =
+            cryptServiceTicket tgsResponse.serviceTicket serviceSecretKey encrypt
+
+        { attribute = attribute
+          serviceTicket = ticket }
 
     let sendTGSResponse (request: TGSRequest): Option<TGSResponse> =
         let services = serviceDictionary
@@ -109,15 +171,14 @@ module KerberosServer =
 
                 Some(encryptTGSResponse response tgt.tgsSessionKey services.[serviceId])
 
-    let sendServiceResponse (request: ServiceRequest): Option<ServiceResponse> =
-        //todo: remove hardcode
-        let serviceSecretKey = "aPb076_!"
+    let sendServiceResponse (request: ServiceRequest) (serviceId: string): Option<ServiceResponse> =
+        let services = serviceDictionary
+        let serviceSecretKey = services.[serviceId]
 
         let ticket =
             cryptServiceTicket request.serviceTicket serviceSecretKey decrypt
 
         let serviceSessionKey = ticket.serviceSessionKey
-        // todo: compare data
         let serviceId = ticket.serviceId
         let timestamp = DateTime.Now.Ticks.ToString()
 

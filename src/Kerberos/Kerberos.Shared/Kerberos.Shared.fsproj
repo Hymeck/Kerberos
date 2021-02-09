@@ -2,11 +2,11 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>Kerberos.Core</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Include="Encryption.fs" />
-        <Compile Include="Core.fs" />
     </ItemGroup>
 
     <ItemGroup>

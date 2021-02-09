@@ -9,7 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Kerberos.Core\Kerberos.Core.fsproj" />
+      <ProjectReference Include="..\Kerberos.Shared\Kerberos.Shared.fsproj" />
     </ItemGroup>
 
 </Project>
